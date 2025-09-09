@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VibeBoard - Daily Mood Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Light Mode Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
+            animation: lightModeFlow 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes lightModeFlow {
+            0%, 100% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+                opacity: 0.3;
+            }
+            33% {
+                transform: translateX(20px) translateY(-15px) rotate(2deg);
+                opacity: 0.5;
+            }
+            66% {
+                transform: translateX(-10px) translateY(10px) rotate(-1deg);
+                opacity: 0.4;
+            }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.03) 50%, transparent 70%);
+            animation: lightSweep 12s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes lightSweep {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+
+        /* Dynamic Background Themes */
+        body.sunrise-theme {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+        }
+
+        body.rain-theme {
+            background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+        }
+
+        body.forest-theme {
+            background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+        }
+
+        body.sunset-theme {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        body.ocean-theme {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #f1f1f1;
+        }
+
+        /* Dark Mode Background Animations */
+        body.dark-mode::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(2px 2px at 20px 30px, #667eea, transparent),
+                radial-gradient(1px 1px at 40px 70px, rgba(102, 126, 234, 0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #f093fb, transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(240, 147, 251, 0.6), transparent),
+                radial-gradient(2px 2px at 160px 30px, #764ba2, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: starfield 6s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        body.dark-mode::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(45deg, transparent 40%, rgba(102, 126, 234, 0.05) 50%, transparent 60%);
+            animation: darkModeSweep 15s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes starfield {
+            0% { transform: translateY(0px) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        @keyframes darkModeSweep {
+            0% { transform: translateX(-150%) translateY(-150%) rotate(45deg); }
+            100% { transform: translateX(150%) translateY(150%) rotate(45deg); }
+        }
+
+        /* Floating Orbs Animation for Dark Mode */
+        body.dark-mode {
+            position: relative;
+        }
+
+        body.dark-mode .container::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: floatOrb1 10s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body.dark-mode .container::after {
+            content: '';
+            position: absolute;
+            top: 60%;
+            right: 15%;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(240, 147, 251, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: floatOrb2 12s ease-in-out infinite reverse;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes floatOrb1 {
+            0%, 100% { 
+                transform: translateX(0) translateY(0) scale(1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translateX(50px) translateY(-30px) scale(1.2);
+                opacity: 0.6;
+            }
+        }
+
+        @keyframes floatOrb2 {
+            0%, 100% { 
+                transform: translateX(0) translateY(0) scale(1);
+                opacity: 0.2;
+            }
+            50% { 
+                transform: translateX(-40px) translateY(25px) scale(1.1);
+                opacity: 0.5;
+            }
+        }
+
+        /* Dark Mode Enhanced Styling */
+        body.dark-mode .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .card::before {
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+        }
+
+        body.dark-mode .mood-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .mood-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        body.dark-mode .mood-btn.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0 25px rgba(102, 126, 234, 0.4);
+        }
+
+        body.dark-mode .quote-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .intention-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .intention-input:focus {
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        body.dark-mode .intention-entry {
+            background: rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #667eea;
+        }
+
+        body.dark-mode .calendar-day {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        body.dark-mode .album-image {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .upload-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        body.dark-mode .stat-item {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .stat-number {
+            color: #667eea;
+        }
+
+        /* Dark mode particles */
+        body.dark-mode .particle {
+            background: #667eea;
+            box-shadow: 0 0 6px #667eea;
+        }
+
+        /* Daily Diary List Styling */
+        .diary-list-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .diary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .diary-entry {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .diary-entry:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .diary-entry.happy {
+            border-left-color: #ffd700;
+        }
+
+        .diary-entry.calm {
+            border-left-color: #4ecdc4;
+        }
+
+        .diary-entry.excited {
+            border-left-color: #ff6b6b;
+        }
+
+        .diary-entry.neutral {
+            border-left-color: #45b7d1;
+        }
+
+        .diary-entry.tired {
+            border-left-color: #667eea;
+        }
+
+        .diary-entry.stressed {
+            border-left-color: #764ba2;
+        }
+
+        .diary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .diary-date {
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .diary-mood {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .diary-mood-icon {
+            font-size: 1.2rem;
+        }
+
+        .diary-preview {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            opacity: 0.9;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .diary-placeholder {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        /* Dark mode diary styling */
+        body.dark-mode .diary-list-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .diary-entry {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        body.dark-mode .diary-entry:hover {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        /* Animated background particles for ambiance */
+        .background-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .theme-toggle, .bg-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            color: inherit;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .theme-toggle:hover, .bg-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            background-size: 300% 100%;
+            animation: gradientMove 2s ease-in-out infinite;
+        }
+
+        @keyframes gradientMove {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Custom Mood Icons with Pinterest-aesthetic styling */
+        .mood-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mood-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mood-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .mood-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .mood-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .mood-btn.active {
+            border-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.2);
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+        }
+
+        .mood-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+        }
+
+        /* Curated Quote Styling with Emotional Flair */
+        .quote-section {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .quote-text {
+            font-size: 1.3rem;
+            font-style: italic;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quote-author {
+            opacity: 0.7;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Music Integration Section */
+        .music-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .music-player {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .music-icon {
+            font-size: 2rem;
+        }
+
+        .music-info {
+            flex: 1;
+        }
+
+        .song-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .song-artist {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .play-btn {
+            background: linear-gradient(45deg, #1db954, #1ed760);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(29, 185, 84, 0.4);
+        }
+
+        .intention-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            color: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .intention-input:focus {
+            outline: none;
+            border-color: #4ecdc4;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .intention-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .intention-history {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px;
+        }
+
+        .intention-entry {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4ecdc4;
+            transition: all 0.3s ease;
+        }
+
+        .intention-entry:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .intention-timestamp {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 8px;
+        }
+
+        .intention-text {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .intention-input-section {
+            position: relative;
+        }
+
+        /* Enhanced Calendar with Gradient Mood Indicators */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .calendar-day.selected-date {
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            transform: scale(1.05);
+        }
+
+        .calendar-day.has-mood {
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: white;
+            font-weight: bold;
+        }
+
+        .calendar-day.has-mood.happy {
+            background: linear-gradient(45deg, #ffd700, #ff6b6b);
+        }
+
+        .calendar-day.has-mood.calm {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .calendar-day.has-mood.excited {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+        }
+
+        .calendar-day.has-mood.stressed {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+        }
+
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 12px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .calendar-header-day {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .current-day {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        /* Upload Button Styling */
+        .upload-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 25px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Album Grid for Uploaded Images */
+        .album-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .album-image {
+            aspect-ratio: 1;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .album-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .album-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+
+        .album-image:hover img {
+            transform: scale(1.1);
+        }
+
+        .album-image .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 107, 107, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            color: white;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .album-image:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .album-placeholder {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+
+        .placeholder-content {
+            opacity: 0.6;
+        }
+
+        .save-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            border-radius: 15px;
+            padding: 15px 30px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 1rem;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-section {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls-bar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .mood-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-particles" id="particles"></div>
+    <div class="floating-shapes">
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="title">✨ VibeBoard</h1>
+            <p class="subtitle">Your personalized sanctuary for mood, music & mindfulness</p>
+            <div class="controls-bar">
+                <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+                <button class="bg-toggle" onclick="cycleBackground()">🎨 Change Vibe</button>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Mood Selector with Custom Icons -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span>🎭</span> Today's Energy
+                </h2>
+                <div class="mood-selector">
+                    <button class="mood-btn" onclick="selectMood('happy', this)">
+                        <span class="mood-icon">✨</span>
+                        <span>Happy</span> 
+                    </button>
+                    <button class="mood-btn" onclick="selectMood('calm', this)">
+                        <span class="mood-icon">🌸</span>
+                        <span>Calm & Peace</span>
+                    </button>
+                    <button class="mood-btn" onclick="selectMood('excited', this)">
+                        <span class="mood-icon">🤩</span>
+                        <span>Excited</span>
+                    </button>
+                    <button class="mood-btn" onclick="selectMood('neutral', this)">
+                        <span class="mood-icon">🌿</span>
+                        <span>Usual </span>
+                    </button>
+                    <button class="mood-btn" onclick="selectMood('tired', this)">
+                        <span class="mood-icon">🌙</span>
+                        <span>Tired</span>
+                    </button>
+                    <button class="mood-btn" onclick="selectMood('stressed', this)">
+                        <span class="mood-icon">🤧</span>
+                        <span>Sad</span>
+                    </button>
+                </div>
+                
+                <!-- Curated Quotes Section -->
+                <div class="quote-section" id="quoteSection">
+                    <p class="quote-text">"Choose your energy, discover your inspiration"</p>
+                    <p class="quote-author">- Your Inner Voice</p>
+                </div>
+                
+                <!-- Music Integration -->
+                <div class="music-section" id="musicSection" style="display:none;">
+                    <div class="music-player">
+                        <div class="music-icon">🎵</div>
+                        <div class="music-info">
+                            <div class="song-title" id="songTitle">Peaceful Mornings</div>
+                            <div class="song-artist" id="songArtist">Ambient Collective</div>
+                        </div>
+                        <button class="play-btn" onclick="toggleMusic()">▶️</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Sacred Intentions Journal -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span>🌟</span> Daily Dairy - <span id="intentionDateDisplay">Today</span>
+                </h2>
+                <div class="intention-history" id="intentionHistory">
+                    <!-- Previous intentions will appear here -->
+                </div>
+                <div class="intention-input-section">
+                    <textarea 
+                        class="intention-input" 
+                        id="intentionInput"
+                        placeholder="Pour your heart onto this digital canvas... What dreams are calling you today? What energy do you want to manifest?"
+                    ></textarea>
+                    <button class="save-btn" onclick="saveIntention()">✨ Anchor This Intention</button>
+                </div>
+            </div>
+
+            <!-- Daily Diary List -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span>📖</span> Daily Diary List
+                </h2>
+                <div class="diary-list-container" id="diaryListContainer">
+                    <div class="diary-list" id="diaryList">
+                        <!-- Diary entries will be populated here -->
+                    </div>
+                    <div class="diary-placeholder" id="diaryPlaceholder" style="display: none;">
+                        <div class="placeholder-content">
+                            <span style="font-size: 3rem; opacity: 0.3;">📝</span>
+                            <p style="opacity: 0.7; margin-top: 10px;">No diary entries yet</p>
+                            <p style="opacity: 0.5; font-size: 0.9rem;">Start writing to see your journey unfold</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Mood Album with Image Upload -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span>📸</span> Daily Mood Album - <span id="albumDateDisplay">Today</span>
+                </h2>
+                <div class="upload-section">
+                    <input type="file" id="imageUpload" accept="image/*" multiple style="display: none;">
+                    <button class="upload-btn" onclick="document.getElementById('imageUpload').click()">
+                        📷 Add Vibe Image
+                    </button>
+                </div>
+                <div class="album-grid" id="albumGrid">
+                    <!-- Uploaded images for the selected date will appear here -->
+                </div>
+                <div class="album-placeholder" id="albumPlaceholder">
+                    <div class="placeholder-content">
+                        <span style="font-size: 3rem; opacity: 0.3;">📸</span>
+                        <p style="opacity: 0.7; margin-top: 10px;">No memories captured yet for this day</p>
+                        <p style="opacity: 0.5; font-size: 0.9rem;">Upload images to create your visual story</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Calendar -->
+            <div class="card">
+                <h2 class="card-title">
+                    <span>📅</span> Emotional Journey
+                </h2>
+                <div class="calendar-header">
+                    <div class="calendar-header-day">Sun</div>
+                    <div class="calendar-header-day">Mon</div>
+                    <div class="calendar-header-day">Tue</div>
+                    <div class="calendar-header-day">Wed</div>
+                    <div class="calendar-header-day">Thu</div>
+                    <div class="calendar-header-day">Fri</div>
+                    <div class="calendar-header-day">Sat</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar days will be generated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Enhanced Statistics -->
+            <div class="card stats-section">
+                <h2 class="card-title">
+                    <span>📊</span> Vibe Analytics
+                </h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number" id="totalDays">0</div>
+                        <div class="stat-label">Days of Growth</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="happyDays">0</div>
+                        <div class="stat-label">Radiant Days</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="currentStreak">0</div>
+                        <div class="stat-label">Magic Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="avgMood">0</div>
+                        <div class="stat-label">Energy Score</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Button -->
+    <button class="reset-button" onclick="resetAllData()" title="Reset All Data">
+        🗑️ Reset
+    </button>
+
+    <script>
+        // Enhanced mood quotes with emotional storytelling flair
+        const moodQuotes = {
+            happy: [
+                { text: "Your light illuminates not just your world, but everyone who crosses your path today.", author: "Inner Radiance" },
+                { text: "Happiness blooms from within, like wildflowers breaking through concrete.", author: "Soul Whispers" },
+                { text: "Today you are a walking constellation of joy.", author: "Cosmic Heart" }
+            ],
+            calm: [
+                { text: "In stillness, you discover the profound strength that resides in your quiet depths.", author: "Ancient Wisdom" },
+                { text: "Your peace is a sanctuary in a chaotic world.", author: "Tranquil Soul" },
+                { text: "Like morning mist, serenity settles gently over your spirit.", author: "Dawn's Promise" }
+            ],
+            excited: [
+                { text: "Your enthusiasm is the spark that lights up possibilities everywhere.", author: "Electric Dreams" },
+                { text: "Today, you are pure kinetic poetry in motion.", author: "Dynamic Spirit" },
+                { text: "Your excitement is contagious - spread it like wildfire.", author: "Blazing Heart" }
+            ],
+            neutral: [
+                { text: "In balance, you find the perfect harmony between doing and being.", author: "Centered Self" },
+                { text: "Sometimes the most profound moments happen in the quiet in-between.", author: "Sacred Pause" },
+                { text: "Your equilibrium is a masterclass in graceful existence.", author: "Balanced Being" }
+            ],
+            tired: [
+                { text: "Rest is not surrender; it's the conscious choice to honor your human rhythm.", author: "Gentle Soul" },
+                { text: "Even the moon takes time to wane before it waxes full again.", author: "Lunar Wisdom" },
+                { text: "Your tiredness is valid, your need for softness is sacred.", author: "Compassionate Heart" }
+            ],
+            stressed: [
+                { text: "Within the storm of stress lies the seed of your greatest breakthrough.", author: "Phoenix Rising" },
+                { text: "You are more resilient than you know, more capable than you believe.", author: "Inner Warrior" },
+                { text: "This intensity is temporary, but your strength is eternal.", author: "Unbreakable Spirit" }
+            ]
+        };
+
+        // Music suggestions for each mood with actual playable links
+        const moodMusic = {
+            happy: { 
+                title: "Haan Ke Haan", 
+                artist: "Sohali Sen", 
+                emoji: "☀️",
+                url: "https://open.spotify.com/track/1WxzZoWBTmB68AtyA6ejBB?si=b9b0f31546194d82"
+            },
+            calm: { 
+                title: "Taakey Olpo Kachhe Dakchhi", 
+                artist: "Mahtim Shakib", 
+                emoji: "🌊",
+                url: "https://open.spotify.com/track/0Vs18iMrL3FBuJCMbnp91T?si=c52436e6627b47dd"
+            },
+            excited: { 
+                title: "Tomar Dyakha Naai", 
+                artist: "Arijit Singh", 
+                emoji: "⚡",
+                url: "https://open.spotify.com/track/6UKui9Z8rP2IXqT64h9Nef?si=f0a0f8dc83ea4d1e"
+            },
+            neutral: { 
+                title: "Ekhon Onek Raat", 
+                artist: "Anupam Roy", 
+                emoji: "⚖️",
+                url: "https://open.spotify.com/track/2FfgDLrH2ryEpQlHQsftlY?si=5d629ffddc464084"
+            },
+            tired: { 
+                title: "Jeno Tomari Kache", 
+                artist: "Ash King", 
+                emoji: "🌙",
+                url: "https://open.spotify.com/track/6iMgrj9v5byFgbl9pyinpF?si=a4ad30aaa35744bd"
+            },
+            stressed: { 
+                title: "Kalank", 
+                artist: "Arijit Singh", 
+                emoji: "🌈",
+                url: "https://open.spotify.com/track/7G5wpuR61ABrT7R1snos7C?si=83e795557ac54216"
+            }
+        };
+
+        // Background themes
+        const backgroundThemes = ['default', 'sunrise-theme', 'rain-theme', 'forest-theme', 'sunset-theme', 'ocean-theme'];
+        let currentThemeIndex = 0;
+
+        // State management
+        let currentMood = null;
+        let moodData = {};
+        let intentionData = {}; // Store intentions by date as arrays for daily entries
+        let imageData = {}; // Store uploaded images by date
+        let currentDate = new Date().toDateString();
+        let selectedDate = currentDate; // Track which date is selected
+        let isPlaying = false;
+
+        // Initialize the app
+        function init() {
+            generateCalendar();
+            updateStats();
+            loadTodaysData();
+            createParticles();
+            setupImageUpload();
+            updateDiaryList();
+            createAdditionalAnimations();
+        }
+
+        // Create ambient background particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Create additional floating animations
+        function createAdditionalAnimations() {
+            // Create random floating micro-particles
+            const container = document.getElementById('particles');
+            
+            for (let i = 0; i < 15; i++) {
+                const microParticle = document.createElement('div');
+                microParticle.className = 'micro-particle';
+                microParticle.style.position = 'absolute';
+                microParticle.style.width = '2px';
+                microParticle.style.height = '2px';
+                microParticle.style.background = 'rgba(255, 255, 255, 0.5)';
+                microParticle.style.borderRadius = '50%';
+                microParticle.style.left = Math.random() * 100 + '%';
+                microParticle.style.top = Math.random() * 100 + '%';
+                microParticle.style.animation = `microFloat ${3 + Math.random() * 3}s ease-in-out infinite`;
+                microParticle.style.animationDelay = Math.random() * 4 + 's';
+                container.appendChild(microParticle);
+            }
+            
+            // Add dynamic CSS for micro particles
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes microFloat {
+                    0%, 100% { 
+                        transform: translateY(0px) translateX(0px);
+                        opacity: 0.3;
+                    }
+                    50% { 
+                        transform: translateY(-30px) translateX(20px);
+                        opacity: 0.8;
+                    }
+                }
+                
+                body.dark-mode .micro-particle {
+                    background: rgba(102, 126, 234, 0.6) !important;
+                    box-shadow: 0 0 4px rgba(102, 126, 234, 0.4);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                button.textContent = '☀️ Light Mode';
+            } else {
+                button.textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // Cycle through background themes
+        function cycleBackground() {
+            const body = document.body;
+            
+            // Remove current theme
+            backgroundThemes.forEach(theme => {
+                if (theme !== 'default') {
+                    body.classList.remove(theme);
+                }
+            });
+            
+            currentThemeIndex = (currentThemeIndex + 1) % backgroundThemes.length;
+            
+            if (backgroundThemes[currentThemeIndex] !== 'default') {
+                body.classList.add(backgroundThemes[currentThemeIndex]);
+            }
+        }
+
+        // Enhanced mood selection with date awareness
+        function selectMood(mood, element) {
+            // Remove active class from all buttons
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to selected button
+            element.classList.add('active');
+            
+            // Set current mood
+            currentMood = mood;
+            
+            // Update quote and music
+            updateQuote(mood);
+            updateMusic(mood);
+            
+            // Save to mood data for the selected date
+            moodData[selectedDate] = mood;
+            
+            // Update calendar and stats
+            updateCalendar();
+            updateStats();
+            updateDiaryList();
+            
+            // Visual feedback for mood selection
+            element.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+            }, 200);
+        }
+
+        // Update quote with emotional storytelling
+        function updateQuote(mood) {
+            const quotes = moodQuotes[mood];
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            
+            const quoteSection = document.getElementById('quoteSection');
+            quoteSection.innerHTML = `
+                <p class="quote-text">"${randomQuote.text}"</p>
+                <p class="quote-author">- ${randomQuote.author}</p>
+            `;
+        }
+
+        // Update music section
+        function updateMusic(mood) {
+            const music = moodMusic[mood];
+            const musicSection = document.getElementById('musicSection');
+            const songTitle = document.getElementById('songTitle');
+            const songArtist = document.getElementById('songArtist');
+            
+            musicSection.style.display = 'block';
+            songTitle.textContent = music.title;
+            songArtist.textContent = music.artist;
+            
+            // Reset play button
+            const playBtn = document.querySelector('.play-btn');
+            playBtn.textContent = '▶️';
+            isPlaying = false;
+        }
+
+        // Toggle music playback with actual link opening
+        function toggleMusic() {
+            const playBtn = document.querySelector('.play-btn');
+            
+            if (currentMood && moodMusic[currentMood]) {
+                if (!isPlaying) {
+                    // Open music link in new tab
+                    window.open(moodMusic[currentMood].url, '_blank');
+                    playBtn.textContent = '⏸️';
+                    isPlaying = true;
+                    
+                    // Add playing animation
+                    playBtn.style.animation = 'pulse 1s ease-in-out infinite';
+                } else {
+                    playBtn.textContent = '▶️';
+                    isPlaying = false;
+                    playBtn.style.animation = '';
+                }
+            } else {
+                alert('💫 Select your mood first to discover the perfect soundtrack for your vibe!');
+            }
+        }
+
+        // Save intention with enhanced feedback
+        function saveIntention() {
+            const intention = document.getElementById('intentionInput').value;
+            if (intention.trim()) {
+                // Create beautiful save feedback
+                const button = document.querySelector('.save-btn');
+                const originalText = button.textContent;
+                button.textContent = '✨ Your intention is now part of the universe';
+                button.style.background = 'linear-gradient(45deg, #4ecdc4, #45b7d1)';
+                
+                // Add a gentle pulse effect
+                button.style.animation = 'pulse 0.5s ease-in-out';
+                
+                // Save intention to the selected date
+                if (!intentionData[selectedDate]) {
+                    intentionData[selectedDate] = [];
+                }
+                
+                const newIntention = {
+                    text: intention.trim(),
+                    timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                    id: Date.now()
+                };
+                
+                intentionData[selectedDate].push(newIntention);
+                
+                // Clear input and refresh displays
+                document.getElementById('intentionInput').value = '';
+                displayIntentionHistory(selectedDate);
+                updateDiaryList();
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'linear-gradient(45deg, #ff6b6b, #4ecdc4)';
+                    button.style.animation = '';
+                }, 3000);
+                
+                console.log('Sacred intention anchored:', intention);
+            }
+        }
+
+        // Update diary list display
+        function updateDiaryList() {
+            const diaryList = document.getElementById('diaryList');
+            const placeholder = document.getElementById('diaryPlaceholder');
+            
+            // Get all dates with diary entries and sort them by date (newest first)
+            const datesWithEntries = Object.keys(intentionData)
+                .filter(date => intentionData[date] && intentionData[date].length > 0)
+                .sort((a, b) => new Date(b) - new Date(a));
+            
+            if (datesWithEntries.length > 0) {
+                diaryList.innerHTML = datesWithEntries.map(dateString => {
+                    const entries = intentionData[dateString];
+                    const mood = moodData[dateString] || 'neutral';
+                    const moodIcon = getMoodIcon(mood);
+                    const date = new Date(dateString);
+                    const isToday = dateString === currentDate;
+                    const displayDate = isToday ? 'Today' : date.toLocaleDateString();
+                    
+                    // Get the latest entry for preview
+                    const latestEntry = entries[entries.length - 1];
+                    
+                    return `
+                        <div class="diary-entry ${mood}" onclick="jumpToDate('${dateString}')">
+                            <div class="diary-header">
+                                <div class="diary-date">${displayDate}</div>
+                                <div class="diary-mood">
+                                    <span class="diary-mood-icon">${moodIcon}</span>
+                                    <span>${capitalizeFirst(mood)}</span>
+                                </div>
+                            </div>
+                            <div class="diary-preview">${latestEntry.text}</div>
+                            ${entries.length > 1 ? `<div style="font-size: 0.8rem; opacity: 0.6; margin-top: 8px;">+${entries.length - 1} more entries</div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                diaryList.style.display = 'flex';
+                placeholder.style.display = 'none';
+            } else {
+                diaryList.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+        }
+        
+        // Get mood icon for diary display
+        function getMoodIcon(mood) {
+            const moodIcons = {
+                happy: '✨',
+                calm: '🌸',
+                excited: '🤩',
+                neutral: '🌿',
+                tired: '🌙',
+                stressed: '🤧'
+            };
+            return moodIcons[mood] || '🌿';
+        }
+        
+        // Capitalize first letter
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+        
+        // Jump to specific date in calendar and load its data
+        function jumpToDate(dateString) {
+            const date = new Date(dateString);
+            const today = new Date();
+            
+            // Only allow jumping to dates in current month for simplicity
+            if (date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear()) {
+                selectedDate = dateString;
+                loadDataForDate(dateString);
+                
+                // Update calendar selection
+                document.querySelectorAll('.calendar-day').forEach(day => {
+                    day.classList.remove('selected-date');
+                    if (parseInt(day.textContent) === date.getDate()) {
+                        day.classList.add('selected-date');
+                    }
+                });
+                
+                // Scroll to top to show the selected data
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Generate enhanced calendar with gradient mood indicators
+        function generateCalendar() {
+            const calendar = document.getElementById('calendarGrid');
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+            
+            // Get first day of month and days in month
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            
+            calendar.innerHTML = '';
+            
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendar.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                const dateString = new Date(currentYear, currentMonth, day).toDateString();
+                
+                // Highlight today
+                if (day === today.getDate()) {
+                    dayElement.classList.add('current-day');
+                }
+                
+                // Add mood-specific gradient if mood exists for this day
+                if (moodData[dateString]) {
+                    dayElement.classList.add('has-mood', moodData[dateString]);
+                }
+                
+                // Add click handler for date selection and mood entry
+                dayElement.addEventListener('click', () => {
+                    selectDate(dateString, dayElement);
+                });
+                
+                calendar.appendChild(dayElement);
+            }
+        }
+
+        // Update calendar with new mood data
+        function updateCalendar() {
+            generateCalendar();
+        }
+
+        // New function to handle date selection
+        function selectDate(dateString, dayElement) {
+            // Remove previous selection highlighting
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected-date');
+            });
+            
+            // Add selection highlighting
+            dayElement.classList.add('selected-date');
+            selectedDate = dateString;
+            
+            // Load mood and intention for selected date
+            loadDataForDate(dateString);
+            
+            // Update UI to show we're viewing a different date
+            updateDateDisplay(dateString);
+        }
+
+        // Load mood and intention data for specific date
+        function loadDataForDate(dateString) {
+            // Clear current mood selection
+            document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Load mood if exists
+            if (moodData[dateString]) {
+                const mood = moodData[dateString];
+                const buttons = document.querySelectorAll('.mood-btn');
+                buttons.forEach(btn => {
+                    if (btn.onclick.toString().includes(`'${mood}'`)) {
+                        btn.classList.add('active');
+                        currentMood = mood;
+                        updateQuote(mood);
+                        updateMusic(mood);
+                    }
+                });
+            } else {
+                // Clear quote and music if no mood
+                const quoteSection = document.getElementById('quoteSection');
+                quoteSection.innerHTML = `
+                    <p class="quote-text">"No mood recorded for this date. Select your energy to add it!"</p>
+                    <p class="quote-author">- VibeBoard</p>
+                `;
+                document.getElementById('musicSection').style.display = 'none';
+                currentMood = null;
+            }
+            
+            // Clear intention input
+            document.getElementById('intentionInput').value = '';
+            
+            // Display intention history and album for this date
+            displayIntentionHistory(dateString);
+            displayAlbumImages(dateString);
+            updateDateDisplays(dateString);
+        }
+
+        // Update date display in UI
+        function updateDateDisplay(dateString) {
+            const date = new Date(dateString);
+            const isToday = dateString === currentDate;
+            const cardTitle = document.querySelector('.card-title');
+            
+            if (isToday) {
+                cardTitle.innerHTML = '<span>🎭</span> Today\'s Energy';
+            } else {
+                cardTitle.innerHTML = `<span>🎭</span> Energy for ${date.toLocaleDateString()}`;
+            }
+        }
+
+        // Enhanced statistics with poetic language
+        function updateStats() {
+            const totalDays = Object.keys(moodData).length;
+            const happyMoods = ['happy', 'excited', 'calm'];
+            const happyDays = Object.values(moodData).filter(mood => happyMoods.includes(mood)).length;
+            
+            document.getElementById('totalDays').textContent = totalDays;
+            document.getElementById('happyDays').textContent = happyDays;
+            document.getElementById('currentStreak').textContent = calculateStreak();
+            document.getElementById('avgMood').textContent = calculateMoodScore().toFixed(1);
+            
+            // Add subtle animation to stats when they update
+            document.querySelectorAll('.stat-number').forEach(stat => {
+                stat.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    stat.style.transform = 'scale(1)';
+                }, 200);
+            });
+        }
+
+        // Calculate current streak
+        function calculateStreak() {
+            let streak = 0;
+            const today = new Date();
+            
+            for (let i = 0; i < 30; i++) {
+                const checkDate = new Date(today);
+                checkDate.setDate(today.getDate() - i);
+                const dateString = checkDate.toDateString();
+                
+                if (moodData[dateString]) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+
+        // Calculate average mood score with enhanced weightings
+        function calculateMoodScore() {
+            if (Object.keys(moodData).length === 0) return 0;
+            
+            const moodScores = {
+                happy: 5,
+                excited: 4.8,
+                calm: 4.5,
+                neutral: 3,
+                tired: 2.5,
+                stressed: 1.5
+            };
+            
+            const scores = Object.values(moodData).map(mood => moodScores[mood] || 3);
+            return scores.reduce((sum, score) => sum + score, 0) / scores.length;
+        }
+
+        // Load today's data and set initial selection
+        function loadTodaysData() {
+            // Set today as initially selected
+            selectedDate = currentDate;
+            loadDataForDate(currentDate);
+            
+            // Highlight today in calendar
+            setTimeout(() => {
+                const todayElement = document.querySelector('.current-day');
+                if (todayElement) {
+                    todayElement.classList.add('selected-date');
+                }
+            }, 100);
+        }
+
+        // Display intention history for a specific date
+        function displayIntentionHistory(dateString) {
+            const historyContainer = document.getElementById('intentionHistory');
+            
+            if (intentionData[dateString] && intentionData[dateString].length > 0) {
+                historyContainer.innerHTML = intentionData[dateString].map(entry => `
+                    <div class="intention-entry">
+                        <div class="intention-timestamp">${entry.timestamp}</div>
+                        <div class="intention-text">${entry.text}</div>
+                    </div>
+                `).join('');
+                historyContainer.style.display = 'block';
+            } else {
+                historyContainer.style.display = 'none';
+            }
+        }
+
+        // Display album images for a specific date
+        function displayAlbumImages(dateString) {
+            const albumGrid = document.getElementById('albumGrid');
+            const placeholder = document.getElementById('albumPlaceholder');
+            
+            if (imageData[dateString] && imageData[dateString].length > 0) {
+                albumGrid.innerHTML = imageData[dateString].map(image => `
+                    <div class="album-image">
+                        <img src="${image.src}" alt="${image.name}" title="Uploaded at ${image.timestamp}">
+                        <button class="delete-btn" onclick="removeImage('${dateString}', '${image.id}')">×</button>
+                    </div>
+                `).join('');
+                albumGrid.style.display = 'grid';
+                placeholder.style.display = 'none';
+            } else {
+                albumGrid.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+        }
+
+        // Remove image from album
+        function removeImage(dateString, imageId) {
+            if (imageData[dateString]) {
+                imageData[dateString] = imageData[dateString].filter(img => img.id != imageId);
+                displayAlbumImages(dateString);
+            }
+        }
+
+        // Update date displays for intentions and album
+        function updateDateDisplays(dateString) {
+            const date = new Date(dateString);
+            const isToday = dateString === currentDate;
+            const dateDisplay = isToday ? 'Today' : date.toLocaleDateString();
+            
+            document.getElementById('intentionDateDisplay').textContent = dateDisplay;
+            document.getElementById('albumDateDisplay').textContent = dateDisplay;
+        }
+
+        // Handle image upload for daily album
+        function setupImageUpload() {
+            const imageUpload = document.getElementById('imageUpload');
+            imageUpload.addEventListener('change', function(event) {
+                const files = event.target.files;
+                
+                if (files.length > 0) {
+                    // Initialize array for this date if it doesn't exist
+                    if (!imageData[selectedDate]) {
+                        imageData[selectedDate] = [];
+                    }
+                    
+                    // Process each uploaded file
+                    Array.from(files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const imageObj = {
+                                src: e.target.result,
+                                name: file.name,
+                                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                                id: Date.now() + Math.random()
+                            };
+                            
+                            imageData[selectedDate].push(imageObj);
+                            displayAlbumImages(selectedDate);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+                
+                // Reset input
+                event.target.value = '';
+            });
+        }
+
+        // Initialize the app when page loads
+        init();
+
+        // Add enhanced sample data with more variety and intentions
+        const sampleDates = [
+            { date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toDateString(), mood: 'happy' },
+            { date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toDateString(), mood: 'calm' },
+            { date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toDateString(), mood: 'excited' },
+            { date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toDateString(), mood: 'neutral' },
+            { date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toDateString(), mood: 'happy' },
+            { date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toDateString(), mood: 'calm' },
+            { date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toDateString(), mood: 'excited' },
+            { date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toDateString(), mood: 'tired' }
+        ];
+
+        // Sample intentions for demonstration (now as daily entries)
+        const sampleIntentions = {
+            [new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toDateString()]: [
+                { text: "Embrace joy in every small moment and share my radiant energy with others.", timestamp: "09:15", id: 1001 },
+                { text: "Remember to call mom and tell her how much she means to me.", timestamp: "14:30", id: 1002 }
+            ],
+            [new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toDateString()]: [
+                { text: "Find peace in stillness and practice mindful breathing throughout the day.", timestamp: "08:45", id: 1003 }
+            ],
+            [new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toDateString()]: [
+                { text: "Channel my excitement into creative projects and meaningful connections.", timestamp: "10:20", id: 1004 },
+                { text: "Start that art project I've been dreaming about.", timestamp: "16:45", id: 1005 }
+            ]
+        };
+
+        // Sample album images (placeholder data)
+        const sampleImages = {
+            [new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toDateString()]: [
+                { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23ff6b6b'/%3E%3Ctext x='75' y='80' font-family='Arial' font-size='40' fill='white' text-anchor='middle'%3E😊%3C/text%3E%3C/svg%3E", name: "Happy Moment", timestamp: "10:30", id: 2001 }
+            ],
+            [new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toDateString()]: [
+                { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%234ecdc4'/%3E%3Ctext x='75' y='80' font-family='Arial' font-size='40' fill='white' text-anchor='middle'%3E🌸%3C/text%3E%3C/svg%3E", name: "Peaceful Vibes", timestamp: "15:20", id: 2002 }
+            ]
+        };
+
+        sampleDates.forEach(item => {
+            moodData[item.date] = item.mood;
+        });
+
+        // Load sample data
+        Object.assign(intentionData, sampleIntentions);
+        Object.assign(imageData, sampleImages);
+
+        // Gallery interaction
+        document.addEventListener('DOMContentLoaded', function() {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            galleryItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Create ripple effect
+                    const ripple = document.createElement('div');
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255,255,255,0.6)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.animation = 'ripple 0.6s linear';
+                    ripple.style.left = '50%';
+                    ripple.style.top = '50%';
+                    ripple.style.width = '20px';
+                    ripple.style.height = '20px';
+                    ripple.style.marginLeft = '-10px';
+                    ripple.style.marginTop = '-10px';
+                    
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                    
+                    console.log('Gallery item clicked:', this.dataset.mood);
+                });
+            });
+        });
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Final updates
+        updateCalendar();
+        updateStats();
+
+        // Reset all data function
+        function resetAllData() {
+            // Show confirmation dialog
+            const confirmReset = confirm(
+                "⚠️ Reset All Data?\n\nThis will permanently delete:\n• All diary entries\n• All mood records\n• All uploaded images\n• All statistics\n\nThis action cannot be undone. Are you sure?"
+            );
+            
+            if (confirmReset) {
+                // Clear all data
+                moodData = {};
+                intentionData = {};
+                imageData = {};
+                
+                // Reset UI elements
+                document.querySelectorAll('.mood-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('intentionInput').value = '';
+                document.getElementById('intentionHistory').style.display = 'none';
+                document.getElementById('albumGrid').style.display = 'none';
+                document.getElementById('albumPlaceholder').style.display = 'block';
+                document.getElementById('diaryList').style.display = 'none';
+                document.getElementById('diaryPlaceholder').style.display = 'block';
+                document.getElementById('musicSection').style.display = 'none';
+                
+                // Reset quote section
+                const quoteSection = document.getElementById('quoteSection');
+                quoteSection.innerHTML = `
+                    <p class="quote-text">"Choose your energy, discover your inspiration"</p>
+                    <p class="quote-author">- Your Inner Voice</p>
+                `;
+                
+                // Update calendar and stats
+                currentMood = null;
+                selectedDate = currentDate;
+                updateCalendar();
+                updateStats();
+                updateDiaryList();
+                
+                // Show success feedback
+                const resetBtn = document.querySelector('.reset-button');
+                const originalText = resetBtn.innerHTML;
+                resetBtn.innerHTML = '✅ Reset Complete';
+                resetBtn.style.background = 'linear-gradient(45deg, #2ecc71, #27ae60)';
+                
+                setTimeout(() => {
+                    resetBtn.innerHTML = originalText;
+                    resetBtn.style.background = 'linear-gradient(45deg, #ff4757, #ff3838)';
+                }, 2000);
+                
+                console.log('All data has been reset');
+            }
+        }
+    </script>
+</body>
+</html>
